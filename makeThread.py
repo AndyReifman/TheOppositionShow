@@ -9,7 +9,6 @@ from collections import Counter
 from itertools import groupby
 from time import sleep
 from bs4 import BeautifulSoup
-import pyotp
 
 def getTimestamp():
         dt = str(datetime.datetime.now().month) + '/' + str(datetime.datetime.now().day) + ' '
@@ -21,12 +20,8 @@ def getTimestamp():
 def loginBot():
     try:
         f = open('/root/reddit/towjk/login.txt')
-        fkey = open('/root/reddit/sidebar/2fakey.txt')
         admin,username,password,subreddit,user_agent,id,secret,redirect = f.readline().split('||',8)
-        key = fkey.readline().rstrip()
-        password += ':'+pyotp.TOTP(key).now()
         f.close()
-        fkey.close()
         r = praw.Reddit(client_id=id,
              client_secret=secret,
              password=password,
@@ -78,7 +73,7 @@ def parseEpisode(index,episode):
 def getEpisode():
     today = str(datetime.datetime.now().year)+'-'
     today += str(datetime.datetime.now().month)+'-' if len(str(datetime.datetime.now().month)) > 1 else '0' +  str(datetime.datetime.now().month)+'-'
-    today += str(datetime.datetime.now().day - 1) if len(str(datetime.datetime.now().day - 1)) > 1 else '0' +  str(datetime.datetime.now().day - 1)
+    today += str(datetime.datetime.now().day) if len(str(datetime.datetime.now().day)) > 1 else '0' +  str(datetime.datetime.now().day)
     month = calendar.month_name[datetime.datetime.now().month]
     website = "https://en.wikipedia.org/wiki/List_of_The_Opposition_with_Jordan_Klepper_episodes#"+month
     tableWebsite = requests.get(website, timeout=15)
@@ -108,7 +103,7 @@ def getEpisode():
 
     titleDate = datetime.datetime.now().month 
     titleDate = calendar.month_name[titleDate]+ " "
-    titleDate += str(datetime.datetime.now().day - 1)+", " if len(str(datetime.datetime.now().day)) > 1 else '0' +  str(datetime.datetime.now().day - 1)+", "
+    titleDate += str(datetime.datetime.now().day)+", " if len(str(datetime.datetime.now().day)) > 1 else '0' +  str(datetime.datetime.now().day)+", "
     titleDate += str(datetime.datetime.now().year)
     title = titleDate + " | The Opposition with Jordan Klepper | "+guest.getText()
     return title,body
